@@ -6,7 +6,27 @@ import random
 
 from models import setup_db, Question, Category
 
-QUESTIONS_PER_PAGE = 10
+QUESTIONS_PER_PAGE = 9
+
+def paginate_questions(request, selection):
+  page = request.args.get('page', 1, type=int)
+  formatted_questions = [question.format() for question in selection]
+  start = (page-1)*QUESTIONS_PER_PAGE
+  end = start + QUESTIONS_PER_PAGE
+  if len(formatted_questions) == 0:
+    abort(404)
+  return formatted_questions[start:end]
+
+
+
+def formatted_categories():
+  selection = Category.query.order_by(Category.id).all()
+  formatted_categories = [category.format() for category in selection]
+  if  len(formatted_categories)==0:
+    abort(404)  
+  return formatted_categories
+
+
 
 def create_app(test_config=None):
   # create and configure the app
@@ -15,18 +35,27 @@ def create_app(test_config=None):
   
   '''
   @TODO: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+  -> ??? (DONE (see below))
   '''
+  CORS(app)
+  '''
+  @TODO: Use the after_request decorator to set Access-Control-Allow 
+  -> DONE (see below)
+  '''
+  @app.after_request
+  def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization, true')
+    response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
+    return response
 
-  '''
-  @TODO: Use the after_request decorator to set Access-Control-Allow
-  '''
-
-  '''
-  @TODO: 
-  Create an endpoint to handle GET requests 
-  for all available categories.
-  '''
-
+ 
+  
+  @app.route('/categories', methods=['GET'])
+  def retrieve_categories():  
+   
+    return jsonify({
+      'categories': formatted_categories()
+      })
 
   '''
   @TODO: 
@@ -39,7 +68,20 @@ def create_app(test_config=None):
   you should see questions and categories generated,
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
+  -> DONE (see below)
   '''
+
+  @app.route('/questions', methods=['GET'])
+  def retrieve_questions():
+    selection = Question.query.order_by(Question.id).all()
+    
+    return jsonify({
+      'questions': paginate_questions(request, selection), 
+      'TotalQuestions' : len(selection),
+      'currentCategory' : '4',                                       #TODO: tbd???
+      'categories' : formatted_categories()
+
+    })
 
   '''
   @TODO: 
@@ -47,7 +89,27 @@ def create_app(test_config=None):
 
   TEST: When you click the trash icon next to a question, the question will be removed.
   This removal will persist in the database and when you refresh the page. 
+  -> TODO: TEST
   '''
+  @app.route('/questions/<int:question_id>', methods=['DELETE'])
+  def delete_question(question_id):
+    
+    try: 
+      question = Question.query.filter(Question.id == question_id).one_or_none() 
+
+      if question is None:
+        abort(404)
+
+      question.delete()
+    
+    
+      return jsonify({
+        'success' : True, 
+        'deleted_question': question_id
+      })
+    
+    except: 
+      abort(422)
 
   '''
   @TODO: 
@@ -59,6 +121,40 @@ def create_app(test_config=None):
   the form will clear and the question will appear at the end of the last page
   of the questions list in the "List" tab.  
   '''
+
+  @app.route('/questions', methods=['POST'])     #TODO: Bisher kommt hier immer noch der Fehler 422 zurück. Das anlegen (CREATE einer Frage funktioniert nicht)
+  def create_question():
+    body = request.get_json()
+      
+    new_question = body.get('question', None) 
+    new_answer = body.get('answer', None)
+    new_category = body.get('category', None)
+    new_difficulty = body.get('difficulty', None)
+    print("in create_question gesprungen")
+    print(new_question)
+    print(new_answer)
+    print(new_category)
+    print(new_difficulty)
+
+    
+    try:
+      question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+      print(question.answer)
+      #question.insert()
+      question.update()
+     
+
+      return jsonify({
+        'success': True
+        #'question': new_question.question,
+        #'question_id' : new_question.id,
+        #'answer' : new_question.answer,
+        #'category' : new_question.category, 
+        #'difficulty': new_question.difficulty
+      })
+    except: 
+      abort(422)
+
 
   '''
   @TODO: 
@@ -98,6 +194,24 @@ def create_app(test_config=None):
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+  @app.errorhandler(422)
+  def unprocessable_entity(error):
+    return jsonify({
+      'success': False, 
+      'error' : 422,
+      'message': 'Unprocessable Entity'
+    }), 422
+
+
+
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+        "success": False, 
+        "error": 404,
+        "message": "Not found"    
+        }), 404
+  
   
   return app
 
