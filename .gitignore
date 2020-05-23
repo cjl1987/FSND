@@ -2,6 +2,14 @@
 __pycache__
 venv
 
+
+# added by user #
+#################
+projects/02_trivia_api/starter/en/
+projects/02_trivia_api/starter/env/
+
+
+
 # OS generated files #
 ######################
 .DS_Store
