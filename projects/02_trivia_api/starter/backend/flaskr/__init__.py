@@ -122,39 +122,42 @@ def create_app(test_config=None):
   of the questions list in the "List" tab.  
   '''
 
-# ===> Exists in BackUp-File without comments <==============
- # @app.route('/questions', methods=['POST'])     #TODO: Bisher kommt hier immer noch der Fehler 422 zurück. Das anlegen (CREATE einer Frage funktioniert nicht)
- # def create_question():
- #   body = request.get_json()
- #     
- #   new_question = body.get('question', None) 
- #   new_answer = body.get('answer', None)
- #   new_category = body.get('category', None)
- #   new_difficulty = body.get('difficulty', None)
- #   print("in create_question gesprungen")
- #   print(new_question)
- #   print(new_answer)
- #   print(new_category)
- #   print(new_difficulty)
 
+  @app.route('/questions', methods=['POST'])     #TODO: Bisher kommt hier immer noch der Fehler 422 zurück. Das anlegen (CREATE einer Frage funktioniert nicht)
+  def create_question():
+    body = request.get_json()
     
- #   try:
- #     question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
- #     print(question.answer)
- #     #question.insert()
- #     question.update()
- #   
-
- #     return jsonify({
- #       'success': True
- #       #'question': new_question.question,
- #       #'question_id' : new_question.id,
- #       #'answer' : new_question.answer,
- #       #'category' : new_question.category, 
- #       #'difficulty': new_question.difficulty
- #     })
- #   except: 
- #     abort(422)
+    new_question = body.get('question', None) 
+    new_answer = body.get('answer', None)
+    new_category = body.get('category', None)
+    new_difficulty = body.get('difficulty', None)
+    print("in create_question gesprungen")
+    print(new_question)
+    print(type(new_question))
+    print(new_answer)
+    print(type(new_answer))
+    print(new_category)
+    print(type(new_category))
+    print(new_difficulty)
+    print(type(new_difficulty))
+    
+    try:
+      question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+      print(question.answer)
+      question.insert()
+      #question.update()
+      
+      
+      return jsonify({
+        'success': True
+        #'question': new_question.question,
+        # #'question_id' : new_question.id,
+  #       #'answer' : new_question.answer,
+  #       #'category' : new_question.category, 
+  #       #'difficulty': new_question.difficulty
+      })
+    except: 
+      abort(422)
 
 
   '''
