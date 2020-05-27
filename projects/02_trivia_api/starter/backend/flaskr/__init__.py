@@ -49,11 +49,11 @@ def create_app(test_config=None):
   setup_db(app)
   
   '''
-  @TODO -> DONE. Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
+  @TODO -> DONE: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
   CORS(app)
   '''
-  @TODO -> : Use the after_request decorator to set Access-Control-Allow 
+  @TODO -> DONE: Use the after_request decorator to set Access-Control-Allow 
   '''
   @app.after_request
   def after_request(response):
@@ -67,7 +67,7 @@ def create_app(test_config=None):
   def retrieve_categories():  
    
     return jsonify({
-      'categories': formatted_categories()
+      'categories': formatted_categories_special()
       })
 
   '''
@@ -87,8 +87,6 @@ def create_app(test_config=None):
   def retrieve_questions():
     selection = Question.query.order_by(Question.id).all()
     
-    print(formatted_categories_special())
-
     return jsonify({
       'questions': paginate_questions(request, selection),
       'total_questions' : len(selection),
@@ -136,40 +134,54 @@ def create_app(test_config=None):
   '''
 
 
-  @app.route('/questions', methods=['POST'])     #TODO: Bisher kommt hier immer noch der Fehler 422 zurück. Das anlegen (CREATE einer Frage funktioniert nicht)
+  @app.route('/questions', methods=['POST'])     #TODO: Bisher kommt hier immer noch der Fehler 422 zurück. Das anlegen (CREATE einer Frage funktioniert nicht)  
   def create_question():
     body = request.get_json()
     
-    new_question = body.get('question', None) 
-    new_answer = body.get('answer', None)
-    new_category = body.get('category', None)
-    new_difficulty = body.get('difficulty', None)
-    print("in create_question gesprungen")
-    print(new_question)
-    print(type(new_question))
-    print(new_answer)
-    print(type(new_answer))
-    print(new_category)
-    print(type(new_category))
-    print(new_difficulty)
-    print(type(new_difficulty))
+    if body.get('searchTerm') is not None:
+      try:
+        selection = Question.query.filter(Question.question.ilike('%'+body.get('searchTerm')+'%')).all()
+        return jsonify({
+          'questions': paginate_questions(request, selection),
+          'total_questions' : len(selection),
+          'categories' : formatted_categories_special(),
+          'current_category' : '4'                                      #TODO: tbd???
+          
+        })
+
+      except:
+        abort(422)
     
-    try:
-      question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
-      print(question.answer)
-      question.insert()
-      #question.update()
+    elif body.get('question') is not None:  
+      new_question = body.get('question', None) 
+      new_answer = body.get('answer', None)
+      new_category = body.get('category', None)
+      new_difficulty = body.get('difficulty', None)
+      print("in create_question gesprungen")
+      print(new_question)
+      print(type(new_question))
+      print(new_answer)
+      print(type(new_answer))
+      print(new_category)
+      print(type(new_category))
+      print(new_difficulty)
+      print(type(new_difficulty))
       
+      try:
+        question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+        print(question.answer)
+        question.insert()                 #TODO: Question insert funktioniert nicht
       
-      return jsonify({
-        'success': True
-        #'question': new_question.question,
-        # #'question_id' : new_question.id,
-  #       #'answer' : new_question.answer,
-  #       #'category' : new_question.category, 
-  #       #'difficulty': new_question.difficulty
-      })
-    except: 
+        #question.update()
+        
+        
+        return jsonify({
+          'success': True
+        })
+      except: 
+        abort(422)
+    
+    else: 
       abort(422)
 
 
