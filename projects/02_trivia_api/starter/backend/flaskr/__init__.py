@@ -29,13 +29,10 @@ def formatted_categories():
 #For the Frontend List 'Categories' on the left side
 def formatted_categories_special():
   selection = Category.query.order_by(Category.id).all()
-  #formatted_categories = [category.format() for category in selection]
   formatted_categories={}
-  x = 0
   for category in selection:
-    formatted_categories["type_"+str(x)]=category.type
-    x=x+1
-
+    formatted_categories[str(category.id)]=category.type
+    #formatted_categories["type_"+str(x)]=category.type
   
   if  len(formatted_categories)==0:
     abort(404)  
@@ -186,7 +183,7 @@ def create_app(test_config=None):
 
 
   '''
-  @TODO: 
+  @TODO -> DONE, see above: 
   Create a POST endpoint to get questions based on a search term. 
   It should return any questions for whom the search term 
   is a substring of the question. 
@@ -197,13 +194,25 @@ def create_app(test_config=None):
   '''
 
   '''
-  @TODO: 
+  @TODO -> DONE: 
   Create a GET endpoint to get questions based on category. 
 
   TEST: In the "List" tab / main screen, clicking on one of the 
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
+
+  @app.route('/categories/<int:category_id>/questions', methods=['GET'])
+  def get_questions_by_category(category_id):
+    selection=Question.query.filter(Question.category==category_id).all()
+    
+    return jsonify({
+      'questions': paginate_questions(request, selection),
+      'total_questions' : len(selection),
+      'categories' : formatted_categories_special(),
+      'current_category' : '4'                                      #TODO: tbd???
+      
+    })
 
 
   '''
@@ -219,10 +228,21 @@ def create_app(test_config=None):
   '''
 
   '''
-  @TODO: 
+  @TODO -> DONE: 
   Create error handlers for all expected errors 
   including 404 and 422. 
   '''
+    
+
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      'success':False, 
+      'error': 400, 
+      'message':'Bad request'
+    }), 400
+  
+
   @app.errorhandler(422)
   def unprocessable_entity(error):
     return jsonify({
@@ -230,7 +250,6 @@ def create_app(test_config=None):
       'error' : 422,
       'message': 'Unprocessable Entity'
     }), 422
-
 
 
   @app.errorhandler(404)
