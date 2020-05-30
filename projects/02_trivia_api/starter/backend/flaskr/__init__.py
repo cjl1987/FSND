@@ -64,6 +64,7 @@ def create_app(test_config=None):
   def retrieve_categories():  
    
     return jsonify({
+      'success':True,
       'categories': formatted_categories_special()
       })
 
@@ -85,11 +86,10 @@ def create_app(test_config=None):
     selection = Question.query.order_by(Question.id).all()
     
     return jsonify({
+      'success' : True,
       'questions': paginate_questions(request, selection),
       'total_questions' : len(selection),
-      'categories' : formatted_categories_special(),
-      'current_category' : '4'                                      #TODO: tbd???
-      
+      'categories' : formatted_categories_special()
     })
 
   '''
@@ -131,7 +131,7 @@ def create_app(test_config=None):
   '''
 
 
-  @app.route('/questions', methods=['POST'])     #TODO: Bisher kommt hier immer noch der Fehler 422 zurück. Das anlegen (CREATE einer Frage funktioniert nicht)  
+  @app.route('/questions', methods=['POST'])     
   def create_question():
     body = request.get_json()
     
@@ -139,11 +139,11 @@ def create_app(test_config=None):
       try:
         selection = Question.query.filter(Question.question.ilike('%'+body.get('searchTerm')+'%')).all()
         return jsonify({
+          'success' : True,
           'questions': paginate_questions(request, selection),
           'total_questions' : len(selection),
           'categories' : formatted_categories_special(),
-          'current_category' : '4'                                      #TODO: tbd???
-          
+
         })
 
       except:
@@ -167,10 +167,8 @@ def create_app(test_config=None):
       try:
         question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
         print(question.answer)
-        question.insert()                 #TODO: Question insert funktioniert nicht
-      
-        #question.update()
-        
+        question.insert()              
+           
         
         return jsonify({
           'success': True
@@ -209,14 +207,12 @@ def create_app(test_config=None):
     return jsonify({
       'questions': paginate_questions(request, selection),
       'total_questions' : len(selection),
-      'categories' : formatted_categories_special(),
-      'current_category' : '4'                                      #TODO: tbd???
-      
+      'categories' : formatted_categories_special()      
     })
 
 
   '''
-  @TODO: 
+  @TODO -> Done: 
   Create a POST endpoint to get questions to play the quiz. 
   This endpoint should take category and previous question parameters 
   and return a random questions within the given category, 
