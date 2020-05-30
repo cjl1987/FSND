@@ -48,7 +48,7 @@ def create_app(test_config=None):
   '''
   @TODO -> DONE: Set up CORS. Allow '*' for origins. Delete the sample route after completing the TODOs
   '''
-  CORS(app)
+  CORS(app, resources={'/': {'origins': '*'}})
   '''
   @TODO -> DONE: Use the after_request decorator to set Access-Control-Allow 
   '''
@@ -226,6 +226,41 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  @app.route('/quizzes', methods=['POST'])
+  def play_trivia():
+    body=request.get_json()
+    to_be_removed=[]
+
+    #check whether category 'ALL' is selected
+    if body.get('quiz_category').get('id') == 0:
+      selection = Question.query.all()
+    else:
+      selection = Question.query.filter(Question.category==body.get('quiz_category').get('id')).all()
+
+    #filter if a question was already shwon to player
+    for question in selection:
+      for previous_question_id in body.get('previous_questions'):        
+        if question.id == previous_question_id:
+          to_be_removed.append(question)  
+    
+    #remove the already shown questions from selection
+    for question_to_remove in to_be_removed:
+      selection.remove(question_to_remove)
+    
+
+    #check if there is a remaining question
+    if len(selection) ==0 :
+      return jsonify({
+        'success' : True,                       
+      })
+    #if question remains, randomize the question  
+    else:
+      x=random.randint(0,(len(selection)-1))
+      return jsonify({
+        'success' : True,
+        'question': selection[x].format()                         
+        })
+
 
   '''
   @TODO -> DONE: 
