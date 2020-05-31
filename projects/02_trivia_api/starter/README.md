@@ -298,7 +298,7 @@ This enpoints allows two possibilities:
 	      "question": "Which dung beetle was worshipped by the ancient Egyptians?"
 	    }
 	  ], 
-	  "succes": true, 
+	  "success": true, 
 	  "total_questions": 2
 	}
 

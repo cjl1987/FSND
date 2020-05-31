@@ -14,7 +14,7 @@ def paginate_questions(request, selection):
   formatted_questions = [question.format() for question in selection]
   start = (page-1)*QUESTIONS_PER_PAGE
   end = start + QUESTIONS_PER_PAGE
-  if len(formatted_questions) == 0:
+  if len(formatted_questions[start:end]) == 0:
     abort(404)
   return formatted_questions[start:end]
 
@@ -53,11 +53,13 @@ def create_app(test_config=None):
   @app.route('/categories', methods=['GET'])
   def retrieve_categories():  
    
-    return jsonify({
-      'success':True,
-      'categories': formatted_categories_special()
-      })
-
+    try:
+      return jsonify({
+        'success':True,
+        'categories': formatted_categories_special()
+        })
+    except:
+      abort(422)
 
   # GET endpoint to handle requests for questions
   @app.route('/questions', methods=['GET'])
@@ -115,7 +117,7 @@ def create_app(test_config=None):
     else:   
       new_question = body.get('question', None) 
       new_answer = body.get('answer', None)
-      new_category = body.get('category', None)
+      new_category = body.get('category', None)            
       new_difficulty = int(body.get('difficulty', None))
       print("in create_question gesprungen")
       print(new_question)
@@ -146,14 +148,17 @@ def create_app(test_config=None):
   #GET endpoint to get questions based on category.
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def get_questions_by_category(category_id):
-    selection=Question.query.filter(Question.category==category_id).all()
     
-    return jsonify({
-      'succes':True,
-      'questions': paginate_questions(request, selection),
-      'total_questions' : len(selection),     
-    })
-
+    try:
+      selection=Question.query.filter(Question.category==category_id).all()
+      
+      return jsonify({
+        'success':True,
+        'questions': paginate_questions(request, selection),
+        'total_questions' : len(selection),     
+      })
+    except:
+      abort(422)
 
   #POST endpoint to get questions to play the quiz
   @app.route('/quizzes', methods=['POST'])
@@ -161,36 +166,38 @@ def create_app(test_config=None):
     body=request.get_json()
     to_be_removed=[]
 
-    #check whether category 'ALL' is selected
-    if body.get('quiz_category').get('id') == 0:
-      selection = Question.query.all()
-    else:
-      selection = Question.query.filter(Question.category==body.get('quiz_category').get('id')).all()
+    try: 
+      #check whether category 'ALL' is selected
+      if body.get('quiz_category').get('id') == 0:
+        selection = Question.query.all()
+      else:
+        selection = Question.query.filter(Question.category==body.get('quiz_category').get('id')).all()
 
-    #filter if a question was already shown in current game
-    for question in selection:
-      for previous_question_id in body.get('previous_questions'):        
-        if question.id == previous_question_id:
-          to_be_removed.append(question)  
-    
-    #remove the already shown questions from selection
-    for question_to_remove in to_be_removed:
-      selection.remove(question_to_remove)
-    
+      #filter if a question was already shown in current game
+      for question in selection:
+        for previous_question_id in body.get('previous_questions'):        
+          if question.id == previous_question_id:
+            to_be_removed.append(question)  
+      
+      #remove the already shown questions from selection
+      for question_to_remove in to_be_removed:
+        selection.remove(question_to_remove)
+      
 
-    #check if there is a remaining question
-    if len(selection) ==0 :
-      return jsonify({
-        'success' : True,                       
-      })
-    #if question remains, randomize and return one question
-    else:
-      x=random.randint(0,(len(selection)-1))
-      return jsonify({
-        'success' : True,
-        'question': selection[x].format()                         
+      #check if there is a remaining question
+      if len(selection) ==0 :
+        return jsonify({
+          'success' : True,                       
         })
-
+      #if question remains, randomize and return one question
+      else:
+        x=random.randint(0,(len(selection)-1))
+        return jsonify({
+          'success' : True,
+          'question': selection[x].format()                         
+          })
+    except:
+      abort(422)
 
   #Error-Handler 400
   @app.errorhandler(400)
