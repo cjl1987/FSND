@@ -100,17 +100,22 @@ class TriviaTestCase(unittest.TestCase):
 
 
     #Test POST endpoint to create new questions
-    #def test_create_new_question(self):
+    def test_create_new_question(self):
+        res = self.client().post('/questions', json={"question":"How high is the Eiffel tower?", "answer":"300 meter", "difficulty": 4, "category":"1"})
+        data = json.loads(res.data.decode('utf-8'))
 
-        #TODO--- > FILL IN
-
+        self.assertEqual(res.status_code, 200)
 
     #Test POST endpoint to create new questions - Error 
+    def test_422_create_new_question_with_missing_json_data(self):
+        res = self.client().post('/questions', json={"answer":"300 meter", "difficulty": 4, "category":"1"})
+        data = json.loads(res.data.decode('utf-8'))
 
-         #TODO--- > FILL IN
+        self.assertEqual(res.status_code, 422)
+        self.assertEqual(data['success'], False)
 
     
-    
+
     #Test POST to get questions based on a search term.
     def test_search_Term(self):
         res = self.client().post('/questions', json={"searchTerm":"paint"})

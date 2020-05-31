@@ -108,7 +108,6 @@ def create_app(test_config=None):
           'questions': paginate_questions(request, selection),
           'total_questions' : len(selection),
           'categories' : formatted_categories_special(),
-
         })
 
       except:
@@ -117,30 +116,18 @@ def create_app(test_config=None):
     else:   
       new_question = body.get('question', None) 
       new_answer = body.get('answer', None)
-      new_category = body.get('category', None)            
+      new_category = body.get('category', None)     
       new_difficulty = int(body.get('difficulty', None))
-      print("in create_question gesprungen")
-      print(new_question)
-      print(type(new_question))
-      print(new_answer)
-      print(type(new_answer))
-      print(new_category)
-      print(type(new_category))
-      print(new_difficulty)
-      print(type(new_difficulty))
+
       
       try:
         question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
-        print(question.answer)
-        print('Difficulty: Value & Type: ')
-        print(question.difficulty)
-        print(type(question.difficulty))
         question.insert()              
-           
         
         return jsonify({
-          'success': True
+          'success': True 
         })
+
       except: 
         abort(422)
     

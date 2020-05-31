@@ -233,9 +233,7 @@ This enpoints allows two possibilities:
 - Sample
 	- curl -X POST -H "Content-Type: application/json" -d '{"question":"How high is the Eiffel tower?", "answer":"300 meter", "difficulty": 4, "category":"1"}' http://127.0.0.1:5000/questions
 	{
-		
-	====================HIER RESPONSE BODY VON CREATE QUESTION einfügen========
-
+	'success': True
 	}
 
 2) Return a search result from question
