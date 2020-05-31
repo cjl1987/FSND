@@ -8,6 +8,7 @@ from models import setup_db, Question, Category
 
 QUESTIONS_PER_PAGE = 10
 
+#Paginate questions 
 def paginate_questions(request, selection):
   page = request.args.get('page', 1, type=int)
   formatted_questions = [question.format() for question in selection]
@@ -17,22 +18,23 @@ def paginate_questions(request, selection):
     abort(404)
   return formatted_questions[start:end]
 
-
-
+''' #========TO BE DELETED=======
+#Formatted categories for the frontend
 def formatted_categories():
   selection = Category.query.order_by(Category.id).all()
   formatted_categories = [category.format() for category in selection]
   if  len(formatted_categories)==0:
     abort(404)  
   return formatted_categories
+'''
 
-#For the Frontend List 'Categories' on the left side
+
+#List 'Categories' 
 def formatted_categories_special():
   selection = Category.query.order_by(Category.id).all()
   formatted_categories={}
   for category in selection:
     formatted_categories[str(category.id)]=category.type
-    #formatted_categories["type_"+str(x)]=category.type
   
   if  len(formatted_categories)==0:
     abort(404)  
@@ -57,9 +59,8 @@ def create_app(test_config=None):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type, Authorization, true')
     response.headers.add('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS')
     return response
-
  
-  
+  # Get Categories
   @app.route('/categories', methods=['GET'])
   def retrieve_categories():  
    
@@ -80,7 +81,7 @@ def create_app(test_config=None):
   ten questions per page and pagination at the bottom of the screen for three pages.
   Clicking on the page numbers should update the questions. 
   '''
-
+  # GET endpoint to handle requests for questions
   @app.route('/questions', methods=['GET'])
   def retrieve_questions():
     selection = Question.query.order_by(Question.id).all()
@@ -100,6 +101,7 @@ def create_app(test_config=None):
   This removal will persist in the database and when you refresh the page. 
   
   '''
+  #Delete endpoint to delete single questions
   @app.route('/questions/<int:question_id>', methods=['DELETE'])
   def delete_question(question_id):
     
@@ -130,7 +132,7 @@ def create_app(test_config=None):
   of the questions list in the "List" tab.  
   '''
 
-
+  # POST endpoint to create new questions AND to get questions based on a search term.  
   @app.route('/questions', methods=['POST'])     
   def create_question():
     body = request.get_json()
@@ -153,7 +155,7 @@ def create_app(test_config=None):
       new_question = body.get('question', None) 
       new_answer = body.get('answer', None)
       new_category = body.get('category', None)
-      new_difficulty = body.get('difficulty', None)
+      new_difficulty = int(body.get('difficulty', None))
       print("in create_question gesprungen")
       print(new_question)
       print(type(new_question))
@@ -167,6 +169,9 @@ def create_app(test_config=None):
       try:
         question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
         print(question.answer)
+        print('Difficulty: Value & Type: ')
+        print(question.difficulty)
+        print(type(question.difficulty))
         question.insert()              
            
         
@@ -199,7 +204,7 @@ def create_app(test_config=None):
   categories in the left column will cause only questions of that 
   category to be shown. 
   '''
-
+  #GET endpoint to get questions based on category.
   @app.route('/categories/<int:category_id>/questions', methods=['GET'])
   def get_questions_by_category(category_id):
     selection=Question.query.filter(Question.category==category_id).all()
@@ -222,6 +227,7 @@ def create_app(test_config=None):
   one question at a time is displayed, the user is allowed to answer
   and shown whether they were correct or not. 
   '''
+  #POST endpoint to get questions to play the quiz
   @app.route('/quizzes', methods=['POST'])
   def play_trivia():
     body=request.get_json()
@@ -233,7 +239,7 @@ def create_app(test_config=None):
     else:
       selection = Question.query.filter(Question.category==body.get('quiz_category').get('id')).all()
 
-    #filter if a question was already shwon to player
+    #filter if a question was already shown in current game
     for question in selection:
       for previous_question_id in body.get('previous_questions'):        
         if question.id == previous_question_id:
@@ -249,7 +255,7 @@ def create_app(test_config=None):
       return jsonify({
         'success' : True,                       
       })
-    #if question remains, randomize the question  
+    #if question remains, randomize and return one question
     else:
       x=random.randint(0,(len(selection)-1))
       return jsonify({
@@ -264,7 +270,7 @@ def create_app(test_config=None):
   including 404 and 422. 
   '''
     
-
+  #Error-Handler 400
   @app.errorhandler(400)
   def bad_request(error):
     return jsonify({
@@ -273,7 +279,7 @@ def create_app(test_config=None):
       'message':'Bad request'
     }), 400
   
-
+  #Error-Handler 422
   @app.errorhandler(422)
   def unprocessable_entity(error):
     return jsonify({
@@ -282,7 +288,7 @@ def create_app(test_config=None):
       'message': 'Unprocessable Entity'
     }), 422
 
-
+  #Error-Handler 404
   @app.errorhandler(404)
   def not_found(error):
     return jsonify({
