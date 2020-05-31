@@ -2,6 +2,22 @@
 __pycache__
 venv
 
+
+# added by user #
+#################
+projects/02_trivia_api/starter/en/
+projects/02_trivia_api/starter/env/
+projects/02_trivia_api/starter/models.pyc
+projects/02_trivia_api/starter/models.pyc
+projects/02_trivia_api/starter/flaskr/__init__.pyc
+
+projects/02_trivia_api/starter/README_old.md
+projects/02_trivia_api/starter/backend/models.pyc
+projects/02_trivia_api/starter/backend/trivia_changed_user.psql
+projects/02_trivia_api/starter/frontend/node_modules/
+
+
+
 # OS generated files #
 ######################
 .DS_Store
