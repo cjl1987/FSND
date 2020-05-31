@@ -282,14 +282,6 @@ This enpoints allows two possibilities:
 - Sample
 	- curl http://127.0.0.1:5000/categories/4/questions
 	{
-	  "categories": {
-	    "1": "Science", 
-	    "2": "Art", 
-	    "3": "Geography", 
-	    "4": "History", 
-	    "5": "Entertainment", 
-	    "6": "Sports"
-	  }, 
 	  "questions": [
 	    {
 	      "answer": "Maya Angelou", 
@@ -306,8 +298,10 @@ This enpoints allows two possibilities:
 	      "question": "Which dung beetle was worshipped by the ancient Egyptians?"
 	    }
 	  ], 
+	  "succes": true, 
 	  "total_questions": 2
 	}
+
 
 ####POST /quizzes
 - General: 
