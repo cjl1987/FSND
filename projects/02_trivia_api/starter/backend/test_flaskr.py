@@ -18,6 +18,15 @@ class TriviaTestCase(unittest.TestCase):
         self.database_path = "postgresql://caryn:geheimwort@localhost:5432/trivia_test"   #"postgres://{}/{}".format('localhost:5432', self.database_name)       #"postgresql://caryn:geheimwort@localhost:5432/trivia"  #My_TODO:Check path
         setup_db(self.app, self.database_path)
 
+        #sample question used in the tests
+        self.new_question = {
+            "question":"How high is the Eiffel tower?", 
+            "answer":"300 meter", 
+            "difficulty": 4, 
+            "category":"1"
+        }
+
+
         # binds the app to the current context
         with self.app.app_context():
             self.db = SQLAlchemy()
@@ -36,7 +45,8 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_get_categories(self):
         res = self.client().get('/categories')
-        data = json.loads(res.data)
+        data = json.loads(res.data.decode('utf-8'))
+        #data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
@@ -46,17 +56,18 @@ class TriviaTestCase(unittest.TestCase):
 
     def test_get_paginated_questions(self):
         res=self.client().get('/questions')
-        data = json.loads(res.data)
+        data = json.loads(res.data.decode('utf-8'))
+        
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
         self.assertTrue(data['total_questions'])
         self.assertTrue(len(data['questions']))
-        self.asserTrue(len(data['categories']))
+        self.assertTrue(len(data['categories']))
 
     def test_404_sent_requesting_beyond_valid_page(self):
         res=self.client().get('/questions?page=1000', )
-        data = json.loads(res.data)
+        data = json.loads(res.data.decode('utf-8'))
 
         self.assertEqual(res.status_code, 404)
         self.assertEqual(data['success'], False)
