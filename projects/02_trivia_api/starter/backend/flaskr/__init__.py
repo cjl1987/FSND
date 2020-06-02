@@ -104,10 +104,10 @@ def create_app(test_config=None):
       try:
         selection = Question.query.filter(Question.question.ilike('%'+body.get('searchTerm')+'%')).all()
         return jsonify({
-          'success' : True,
+          'success': True,
           'questions': paginate_questions(request, selection),
-          'total_questions' : len(selection),
-          'categories' : formatted_categories_special(),
+          'total_questions': len(selection),
+          'categories': formatted_categories_special(),
         })
 
       except:
@@ -121,7 +121,8 @@ def create_app(test_config=None):
 
       
       try:
-        question = Question(question=new_question, answer=new_answer, category=new_category, difficulty=new_difficulty)
+        question = Question(question=new_question, answer=new_answer,
+                            category=new_category, difficulty=new_difficulty)
         question.insert()              
         
         return jsonify({
