@@ -119,7 +119,16 @@ def create_app(test_config=None):
       new_category = body.get('category', None)     
       new_difficulty = int(body.get('difficulty', None))
 
-      
+      if new_question == None:
+          abort(422) 
+      if new_answer == None:
+          abort(422)
+      if new_category == None:
+          abort(422)
+      if new_difficulty == None:
+          abort(422)
+          
+
       try:
         question = Question(question=new_question, answer=new_answer,
                             category=new_category, difficulty=new_difficulty)
