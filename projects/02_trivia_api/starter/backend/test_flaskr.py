@@ -115,7 +115,6 @@ class TriviaTestCase(unittest.TestCase):
         self.assertEqual(data['success'], False)
 
     
-
     #Test POST to get questions based on a search term.
     def test_search_Term(self):
         res = self.client().post('/questions', json={"searchTerm":"paint"})
@@ -133,7 +132,6 @@ class TriviaTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 422)
         self.assertEqual(data['success'], False)
-
 
 
     #Test GET endpoint to get questions based on category.
