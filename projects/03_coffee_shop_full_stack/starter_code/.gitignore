@@ -3,6 +3,14 @@ venv/
 __pycache__/
 test.db
 
+
+../../../BasicFlaskAuth/app_2.py
+../../../BasicFlaskAuth/env/
+../../../FlaskRecap/env/
+
+
+
+
 # OS generated files #
 ######################
 .DS_Store
