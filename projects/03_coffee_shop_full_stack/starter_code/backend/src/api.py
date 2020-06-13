@@ -28,6 +28,26 @@ db_drop_and_create_all()
         or appropriate status code indicating reason for failure
 '''
 
+#GET endpoint to get drinks
+@app.route('/drinks', methods=['GET'])
+def get_drinks():
+    try:
+        drinks = []
+        selection=Drink.query.all()
+
+        if len(selection) == 0:
+            abort(404)
+
+        for drinks in selection:
+            drinks.append(drinks.short())
+
+        return jsonify({
+                        "success": True,
+                        "drinks": drinks
+                        })
+    except:
+        abort(422)
+
 
 '''
 @TODO implement endpoint
@@ -76,9 +96,7 @@ db_drop_and_create_all()
 
 
 ## Error Handling
-'''
-Example error handling for unprocessable entity
-'''
+
 #Error-Handler 422
 @app.errorhandler(422)
 def unprocessable(error):
@@ -96,40 +114,20 @@ def resource_not_found(error):
                     "success": False,
                     "error": 404, 
                     "message": "resource not found"
-                    }, 404)
+                    }), 404
+
+
+#Error-Handler 400
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify({
+                    "success": False, 
+                    "error": 400,
+                    "message": "bad request"
+                    }), 400
 
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
 
-
-#===========================  Ab hier von vorigem Projekt kopiert ==============
-
-  #Error-Handler 400
-  @app.errorhandler(400)
-  def bad_request(error):
-    return jsonify({
-      'success':False, 
-      'error': 400, 
-      'message':'Bad request'
-    }), 400
-  
-  #Error-Handler 422
-  @app.errorhandler(422)
-  def unprocessable_entity(error):
-    return jsonify({
-      'success': False, 
-      'error' : 422,
-      'message': 'Unprocessable Entity'
-    }), 422
-
-  #Error-Handler 404
-  @app.errorhandler(404)
-  def not_found(error):
-    return jsonify({
-        'success': False, 
-        'error': 404,
-        'message': 'Not found'    
-        }), 404
-  
