@@ -79,6 +79,7 @@ db_drop_and_create_all()
 '''
 Example error handling for unprocessable entity
 '''
+#Error-Handler 422
 @app.errorhandler(422)
 def unprocessable(error):
     return jsonify({
@@ -87,24 +88,48 @@ def unprocessable(error):
                     "message": "unprocessable"
                     }), 422
 
-'''
-@TODO implement error handlers using the @app.errorhandler(error) decorator
-    each error handler should return (with approprate messages):
-             jsonify({
-                    "success": False, 
-                    "error": 404,
+
+#Error-Handler 404
+@app.errorhandler(404)
+def resource_not_found(error):
+    return jsonify({
+                    "success": False,
+                    "error": 404, 
                     "message": "resource not found"
-                    }), 404
-
-'''
-
-'''
-@TODO implement error handler for 404
-    error handler should conform to general task above 
-'''
-
+                    }, 404)
 
 '''
 @TODO implement error handler for AuthError
     error handler should conform to general task above 
 '''
+
+
+#===========================  Ab hier von vorigem Projekt kopiert ==============
+
+  #Error-Handler 400
+  @app.errorhandler(400)
+  def bad_request(error):
+    return jsonify({
+      'success':False, 
+      'error': 400, 
+      'message':'Bad request'
+    }), 400
+  
+  #Error-Handler 422
+  @app.errorhandler(422)
+  def unprocessable_entity(error):
+    return jsonify({
+      'success': False, 
+      'error' : 422,
+      'message': 'Unprocessable Entity'
+    }), 422
+
+  #Error-Handler 404
+  @app.errorhandler(404)
+  def not_found(error):
+    return jsonify({
+        'success': False, 
+        'error': 404,
+        'message': 'Not found'    
+        }), 404
+  
