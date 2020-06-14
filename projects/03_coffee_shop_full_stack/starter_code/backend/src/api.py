@@ -33,14 +33,20 @@ db_drop_and_create_all()
 def get_drinks():
     try:
         drinks = []
+        print('GET: Before Database Query')
         selection=Drink.query.all()
-
-        if len(selection) == 0:
-            abort(404)
-
-        for drinks in selection:
-            drinks.append(drinks.short())
-
+        print('GET: After Database Query')
+        #print(selection)
+        #if len(selection) == 0:
+        #    print('In IF == 0 Body gesprungen')
+        #    abort(400)
+        print('Vor der For LOOP')
+        for drinks_selected in selection:
+            print('in for LOOP gesprungen')
+            print(drinks_selected.short())
+            #drinks.append(drinks_selected.short())
+        print('GET drinks (LIST):')
+        #print(drinks)
         return jsonify({
                         "success": True,
                         "drinks": drinks
@@ -68,6 +74,65 @@ def get_drinks():
     returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
         or appropriate status code indicating reason for failure
 '''
+
+'''
+# Example for Post-Method:
+
+title: 'cap',
+recipe: [
+        {  
+            name: 'foam',
+            color: 'white',
+            parts: 1
+        },
+        {
+            name: 'milk',
+            color: 'grey',
+            parts: 2
+        },
+        {
+            name: 'coffee',
+            color: 'brown',
+            parts: 1
+        }
+        ]
+
+'''
+
+
+
+# POST /drinks  
+@app.route('/drinks', methods=['POST'])     
+def create_drink():
+    body = request.get_json()
+     
+    new_title = body.get('title', None)
+    new_recipe = str(body.get('recipe', None))
+
+    print('title for POST:')
+    print(new_title)
+    print(type(new_title))
+    print('recipe for POST:')
+    print(new_recipe)
+    print(type(new_recipe))
+
+    if new_title == None:
+        print('If - LOOP no title')
+        abort(422) 
+    
+    if new_recipe == None:
+        abort(422) 
+
+    try:
+        drink = Drink(title=new_title, recipe=new_recipe)
+        drink.insert()             
+        return jsonify({
+                        "success": True,
+                        "drinks": "currently empty"
+                        })
+    except:
+        abort(422)
+
 
 
 '''
