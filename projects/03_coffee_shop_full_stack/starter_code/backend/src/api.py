@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-db_drop_and_create_all()
+#db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -33,20 +33,17 @@ db_drop_and_create_all()
 def get_drinks():
     try:
         drinks = []
-        print('GET: Before Database Query')
+
+        #get drinks from data base
         selection=Drink.query.all()
-        print('GET: After Database Query')
-        #print(selection)
-        #if len(selection) == 0:
-        #    print('In IF == 0 Body gesprungen')
-        #    abort(400)
-        print('Vor der For LOOP')
+        
+        #check whether selection is empty
+        if len(selection) == 0:
+            abort(422)
+        
+        #return all drinks in short() form
         for drinks_selected in selection:
-            print('in for LOOP gesprungen')
-            print(drinks_selected.short())
-            #drinks.append(drinks_selected.short())
-        print('GET drinks (LIST):')
-        #print(drinks)
+            drinks.append(drinks_selected.short())
         return jsonify({
                         "success": True,
                         "drinks": drinks
@@ -68,67 +65,43 @@ def get_drinks():
 '''
 @TODO implement endpoint
     POST /drinks
-        it should create a new row in the drinks table
+        DONE - it should create a new row in the drinks table
         it should require the 'post:drinks' permission
         it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
-        or appropriate status code indicating reason for failure
+    DONE -returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the newly created drink
+        DONE - or appropriate status code indicating reason for failure
 '''
-
-'''
-# Example for Post-Method:
-
-title: 'cap',
-recipe: [
-        {  
-            name: 'foam',
-            color: 'white',
-            parts: 1
-        },
-        {
-            name: 'milk',
-            color: 'grey',
-            parts: 2
-        },
-        {
-            name: 'coffee',
-            color: 'brown',
-            parts: 1
-        }
-        ]
-
-'''
-
 
 
 # POST /drinks  
 @app.route('/drinks', methods=['POST'])     
 def create_drink():
+    #get json object
     body = request.get_json()
-     
     new_title = body.get('title', None)
-    new_recipe = str(body.get('recipe', None))
+    new_recipe = body.get('recipe', None)
 
-    print('title for POST:')
-    print(new_title)
-    print(type(new_title))
-    print('recipe for POST:')
-    print(new_recipe)
-    print(type(new_recipe))
+    #recipe needs to be list type
+    if isinstance(new_recipe, dict):
+        new_recipe = [new_recipe]
 
+    #check whether user input is complete
     if new_title == None:
-        print('If - LOOP no title')
         abort(422) 
-    
     if new_recipe == None:
         abort(422) 
 
     try:
-        drink = Drink(title=new_title, recipe=new_recipe)
-        drink.insert()             
+        #add row in data base
+        drink = Drink()
+        drink.title = new_title
+        drink.recipe = json.dumps(new_recipe)
+        drink.insert()
+
+        #return json response          
         return jsonify({
                         "success": True,
-                        "drinks": "currently empty"
+                        "drinks": [drink.long()]
                         })
     except:
         abort(422)
