@@ -16,7 +16,7 @@ CORS(app)
 !! NOTE THIS WILL DROP ALL RECORDS AND START YOUR DB FROM SCRATCH
 !! NOTE THIS MUST BE UNCOMMENTED ON FIRST RUN
 '''
-#db_drop_and_create_all()
+db_drop_and_create_all()
 
 ## ROUTES
 '''
@@ -27,6 +27,7 @@ CORS(app)
     DONE - returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
         DONE - or appropriate status code indicating reason for failure
 '''
+
 
 #GET endpoint to get drinks
 @app.route('/drinks', methods=['GET'])
@@ -44,12 +45,14 @@ def get_drinks():
         #return all drinks in short() form
         for drinks_selected in selection:
             drinks.append(drinks_selected.short())
+        
         return jsonify({
-                        "success": True,
+                        "success": True, 
                         "drinks": drinks
-                        })
-    except:
+                        }), 200
+    except: 
         abort(422)
+
 
 
 '''
@@ -73,7 +76,7 @@ def get_drinks_detail():
         if len(selection) == 0:
             abort(422)
         
-        #return all drinks in short() form
+        #return all drinks in long() form
         for drinks_selected in selection:
             drinks.append(drinks_selected.long())
         
@@ -105,9 +108,9 @@ def create_drink():
     new_title = body.get('title', None)
     new_recipe = body.get('recipe', None)
 
-    #cast recipe to be list type
-    #if isinstance(new_recipe, dict):
-    #    new_recipe = [new_recipe]
+    #cast new recipe to list
+    if isinstance(new_recipe, dict):
+        new_recipe = [new_recipe]   
 
     #check whether user input is complete
     if new_title == None:
@@ -205,7 +208,7 @@ def delete_drink(drink_id):
                         'success' : True, 
                         'delete': drink_id
                         }), 200
-                        
+
     except: 
         abort(422)
 
