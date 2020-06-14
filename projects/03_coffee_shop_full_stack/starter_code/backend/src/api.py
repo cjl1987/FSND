@@ -80,7 +80,7 @@ def get_drinks_detail():
         return jsonify({
                         "success": True, 
                         "drinks": drinks
-                        })
+                        }), 200
     except: 
         abort(422)
 
@@ -105,9 +105,9 @@ def create_drink():
     new_title = body.get('title', None)
     new_recipe = body.get('recipe', None)
 
-    #recipe needs to be list type
-    if isinstance(new_recipe, dict):
-        new_recipe = [new_recipe]
+    #cast recipe to be list type
+    #if isinstance(new_recipe, dict):
+    #    new_recipe = [new_recipe]
 
     #check whether user input is complete
     if new_title == None:
@@ -135,14 +135,44 @@ def create_drink():
 '''
 @TODO implement endpoint
     PATCH /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should update the corresponding row for <id>
-        it should require the 'patch:drinks' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
-        or appropriate status code indicating reason for failure
+        DONE - where <id> is the existing model id
+        TODO - it should respond with a 404 error if <id> is not found
+        DONE - it should update the corresponding row for <id>
+        TODO - it should require the 'patch:drinks' permission
+        DONE - it should contain the drink.long() data representation
+    DONE - returns status code 200 and json {"success": True, "drinks": drink} where drink an array containing only the updated drink
+        DONE - or appropriate status code indicating reason for failure
 '''
+
+#PATCH drink by provided drink_id
+@app.route('/drinks/<int:drink_id>', methods=['PATCH'])
+def drinks_update(drink_id):
+    #load PATCH body
+    body = request.get_json()
+
+    #get drink by id
+    try:
+        drink = Drink.query.filter(Drink.id==drink_id).one_or_none()
+       
+        #Error handling
+        if drink is None:
+            abort(404)
+
+        #prepare body
+        if body.get('title'):
+            drink.title = body.get('title')
+        if body.get('recipe'):
+            drink.recipe = json.dumps(body.get('recipe'))
+        
+        #update data base
+        drink.update()
+        return jsonify({
+                        "success": True, 
+                        "drinks": drink.long()
+                        }), 200
+    except:
+        abort(422)
+
 
 
 '''
