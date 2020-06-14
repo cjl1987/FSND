@@ -20,12 +20,12 @@ CORS(app)
 
 ## ROUTES
 '''
-@TODO implement endpoint
-    GET /drinks
-        it should be a public endpoint
-        it should contain only the drink.short() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+@DONE - TODO implement endpoint
+    DONE - GET /drinks
+        DONE - it should be a public endpoint
+        DONE - it should contain only the drink.short() data representation
+    DONE - returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+        DONE - or appropriate status code indicating reason for failure
 '''
 
 #GET endpoint to get drinks
@@ -56,10 +56,34 @@ def get_drinks():
 @TODO implement endpoint
     GET /drinks-detail
         it should require the 'get:drinks-detail' permission
-        it should contain the drink.long() data representation
-    returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
-        or appropriate status code indicating reason for failure
+        DONE - it should contain the drink.long() data representation
+    DONE - returns status code 200 and json {"success": True, "drinks": drinks} where drinks is the list of drinks
+        DONE - or appropriate status code indicating reason for failure
 '''
+#GET endpoint to get drinks-detail
+@app.route('/drinks-detail', methods=['GET'])
+def get_drinks_detail():
+    try:
+        drinks = []
+
+        #get drinks from data base
+        selection=Drink.query.all()
+        
+        #check whether selection is empty
+        if len(selection) == 0:
+            abort(422)
+        
+        #return all drinks in short() form
+        for drinks_selected in selection:
+            drinks.append(drinks_selected.long())
+        
+        return jsonify({
+                        "success": True, 
+                        "drinks": drinks
+                        })
+    except: 
+        abort(422)
+
 
 
 '''
