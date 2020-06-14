@@ -7,6 +7,7 @@ test.db
 ../../../BasicFlaskAuth/app_2.py
 ../../../BasicFlaskAuth/env/
 ../../../FlaskRecap/env/
+../frontend/node_modules
 
 
 
