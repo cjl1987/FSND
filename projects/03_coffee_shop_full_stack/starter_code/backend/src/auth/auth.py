@@ -10,9 +10,6 @@ AUTH0_DOMAIN = 'cjl.eu.auth0.com'
 ALGORITHMS = ['RS256']
 API_AUDIENCE = 'CoffeeShop'
 
-#AUTH0_DOMAIN = 'udacity-fsnd.auth0.com'
-#ALGORITHMS = ['RS256']
-#API_AUDIENCE = 'dev'
 
 ## AuthError Exception
 '''
@@ -27,44 +24,34 @@ class AuthError(Exception):
 
 ## Auth Header
 
-'''
-@TODO implement get_token_auth_header() method
-    DONE - it should attempt to get the header from the request
-        it should raise an AuthError if no header is present
-    DONE - it should attempt to split bearer and the token
-        DONE - it should raise an AuthError if the header is malformed
-    DONE - return the token part of the header
-'''
+#Get and validate header for Authorization and header
 def get_token_auth_header():
     
-    #try: 
-        if 'Authorization' not in request.headers:
-            abort(401)
+    if 'Authorization' not in request.headers:
+        raise AuthError({
+                        'code': 'Authorization not sent',
+                        'description': 'Authorization is not included in Header.'
+                        }, 401)
 
-        auth_header = request.headers['Authorization']
-        headers_parts = auth_header.split(' ')
+    auth_header = request.headers['Authorization']
+    headers_parts = auth_header.split(' ')
 
-        if len(headers_parts) != 2:
-            abort(401)
-        elif headers_parts[0].lower() != 'bearer':
-            abort(401)
+    if len(headers_parts) != 2:
+         raise AuthError({
+                        'code': 'Authorization not valid',
+                        'description': 'Authorization does not contain two words'
+                        }, 401)
+    elif headers_parts[0].lower() != 'bearer':
+         raise AuthError({
+                        'code': 'Authorization not valid',
+                        'description': 'Authorization does not include the word -bearer-'
+                        }, 401)
 
-        return headers_parts[1]
+    return headers_parts[1]
 
-    #except:
-        #raise Exception('Not Implemented')
 
-'''
-@TODO implement check_permissions(permission, payload) method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-        payload: decoded jwt payload
 
-    it should raise an AuthError if permissions are not included in the payload
-        !!NOTE check your RBAC settings in Auth0
-    it should raise an AuthError if the requested permission string is not in the payload permissions array
-    return true otherwise
-'''
+# Check permissions
 def check_permissions(permission, payload):
     if 'permissions' not in payload:
         raise AuthError({
@@ -78,23 +65,10 @@ def check_permissions(permission, payload):
                         'description': 'Permission not found.'
                         }, 403)
     return True
-    
-    #raise Exception('Not Implemented')
 
 
-'''
-@TODO implement verify_decode_jwt(token) method
-    @INPUTS
-        token: a json web token (string)
 
-    DONE - it should be an Auth0 token with key id (kid)
-    DONE - it should verify the token using Auth0 /.well-known/jwks.json
-    DOEN - it should decode the payload from the token
-    TODO - it should validate the claims
-    DONE - return the decoded payload
-
-    !!NOTE urlopen has a common certificate error described here: https://stackoverflow.com/questions/50236117/scraping-ssl-certificate-verify-failed-error-for-http-en-wikipedia-org
-'''
+#Verify jwt
 def verify_decode_jwt(token):
     # GET THE PUBLIC KEY FROM AUTH0
     jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
@@ -157,18 +131,7 @@ def verify_decode_jwt(token):
             }, 400)
 
 
-    #raise Exception('Not Implemented')
-
-'''
-@TODO implement @requires_auth(permission) decorator method
-    @INPUTS
-        permission: string permission (i.e. 'post:drink')
-
-    it should use the get_token_auth_header method to get the token
-    it should use the verify_decode_jwt method to decode the jwt
-    it should use the check_permissions method validate claims and check the requested permission
-    return the decorator which passes the decoded payload to the decorated method
-'''
+#Decorator 
 def requires_auth(permission=''):
     def requires_auth_decorator(f):
         @wraps(f)
@@ -177,7 +140,10 @@ def requires_auth(permission=''):
             try:
                 payload = verify_decode_jwt(token)
             except:
-                abort(401)
+                raise AuthError({
+                        'code': 'Authorization not valid',
+                        'description': 'Authorization is not valid'
+                        }, 401)
             check_permissions(permission, payload)
             return f(payload, *args, **kwargs)
 
