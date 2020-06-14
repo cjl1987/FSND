@@ -154,7 +154,7 @@ def drinks_update(drink_id):
     try:
         drink = Drink.query.filter(Drink.id==drink_id).one_or_none()
        
-        #Error handling
+        #error 404
         if drink is None:
             abort(404)
 
@@ -178,13 +178,37 @@ def drinks_update(drink_id):
 '''
 @TODO implement endpoint
     DELETE /drinks/<id>
-        where <id> is the existing model id
-        it should respond with a 404 error if <id> is not found
-        it should delete the corresponding row for <id>
-        it should require the 'delete:drinks' permission
-    returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
-        or appropriate status code indicating reason for failure
+        DONE - where <id> is the existing model id
+        TODO -  it should respond with a 404 error if <id> is not found
+        DONE - it should delete the corresponding row for <id>
+        TODO - it should require the 'delete:drinks' permission
+    DONE - returns status code 200 and json {"success": True, "delete": id} where id is the id of the deleted record
+        DONE - or appropriate status code indicating reason for failure
 '''
+
+#Delete drink
+@app.route('/drinks/<int:drink_id>', methods=['DELETE'])
+def delete_drink(drink_id):
+    
+    try: 
+        #get drink by drink_id
+        drink = Drink.query.filter(Drink.id==drink_id).one_or_none() 
+
+        #error 404
+        if drink is None:
+            abort(404)
+
+        #delete row in data base
+        drink.delete()
+   
+        return jsonify({
+                        'success' : True, 
+                        'delete': drink_id
+                        }), 200
+                        
+    except: 
+        abort(422)
+
 
 
 ## Error Handling
