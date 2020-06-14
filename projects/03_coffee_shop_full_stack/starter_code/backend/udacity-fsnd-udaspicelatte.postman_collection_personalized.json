@@ -339,7 +339,7 @@
 							"bearer": [
 								{
 									"key": "token",
-									"value": "{{Token_Barista}}",
+									"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6IlJscHVVQXd6WllDOS1wZFRzaVVwWCJ9.eyJpc3MiOiJodHRwczovL2NqbC5ldS5hdXRoMC5jb20vIiwic3ViIjoiYXV0aDB8NWVkZDZiNjhmODdhMmEwMDE5OWI4ZWZhIiwiYXVkIjoiQ29mZmVlU2hvcCIsImlhdCI6MTU5MjE0NDk4NCwiZXhwIjoxNTkyMjMxMzg0LCJhenAiOiJVaTJGejVrWDJpdVBvNjZqUFJta0dtbXNjWVFoVFJXUiIsInNjb3BlIjoiIiwicGVybWlzc2lvbnMiOlsiZ2V0OmRyaW5rcy1kZXRhaWwiXX0.d3Y02YfRGOH7SXFik_gir1zZPIVI1vdzULxJMj-JF7ByslXMjCzfnX2laoafq99wOad69jhlcAZpRQYFuusCKLYPZtXRor-vMp8tCLbYyUDkGr3v9lUAQPspHmHji1trpQzZTgNvJ7GMzlRxrHP_21yHWNVBZb3QYUjpXLousBE9tsf3dXA5Guh74_fpqlGz7bIglvZ9ez_z9lcHTmA0xn3Vg2pvhsiMBR-LdkOU1FCvGaBR4DZzy7yNEc-gULI04enAf5jmaAqmW4_r6bks8wsAgGDnKlufjFwBfKlU1VPKDg0XmTFKOSVzP6Vu5K1gyYCtGvOCePyrAWqf1kC4bQ",
 									"type": "string"
 								}
 							]
@@ -584,8 +584,8 @@
 							"script": {
 								"id": "1d45edb0-8946-4048-bac2-ce3db9cf327a",
 								"exec": [
-									"pm.test(\"Status code is 200\", function () {",
-									"    pm.response.to.have.status(200);",
+									"pm.test(\"Status code is 201\", function () {",
+									"    pm.response.to.have.status(201);",
 									"});"
 								],
 								"type": "text/javascript"
@@ -614,7 +614,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Sugar82\",\n    \"recipe\": \n            {\n            \"name\": \"Milk\",\n            \"color\": \"white\",\n            \"parts\": 3\n            }\n}"
+							"raw": "{\n    \"title\": \"Sugar862\",\n    \"recipe\": \n            {\n            \"name\": \"Milk\",\n            \"color\": \"white\",\n            \"parts\": 3\n            }\n}"
 						},
 						"url": {
 							"raw": "{{host}}/drinks",
@@ -716,13 +716,13 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/drinks/100",
+							"raw": "{{host}}/drinks/1",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"drinks",
-								"100"
+								"1"
 							]
 						}
 					},
