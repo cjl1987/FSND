@@ -32,7 +32,10 @@ def get_drinks():
         selection = Drink.query.all()
         # check whether selection is empty
         if len(selection) == 0:
-            abort(422)
+            return jsonify({
+                            'success': False,
+                            'error': 'No drink available'
+                            }), 404
         # return all drinks in short() form
         for drinks_selected in selection:
             drinks.append(drinks_selected.short())
@@ -54,7 +57,10 @@ def get_drinks_detail(jwt):
         selection = Drink.query.all()
         # check whether selection is empty
         if len(selection) == 0:
-            abort(404)
+            return jsonify({
+                            'success': False,
+                            'error': 'No drink available'
+                            }), 404
         # return all drinks in long() form
         for drinks_selected in selection:
             drinks.append(drinks_selected.long())
@@ -139,7 +145,11 @@ def delete_drink(jwt, drink_id):
         drink = Drink.query.filter(Drink.id == drink_id).one_or_none()
         # error 404
         if drink is None:
-            abort(404)
+            return jsonify({
+                            'success': False,
+                            'error': 'Drink id not found to be edited', 
+                            'drink_id': drink_id
+                            }), 404
         # delete row in data base
         drink.delete()
         return jsonify({
